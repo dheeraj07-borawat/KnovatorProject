@@ -1,0 +1,27 @@
+version: '3'
+
+services:
+  # Node.js Service
+  node-app:
+    build:
+      context: ./node
+    ports:
+      - "5000:5000"
+
+  # React Service
+  react-app:
+    build:
+      context: ./hello-react-app
+    ports:
+      - "3000:3000"
+
+  # Nginx Service as Reverse Proxy
+  nginx-proxy:
+    image: nginx:latest
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - node-app
+      - react-app
