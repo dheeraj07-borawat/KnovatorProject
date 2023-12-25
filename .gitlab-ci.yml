@@ -1,0 +1,41 @@
+stages:
+  - setup
+  - deploy
+
+variables:
+  SSH_PRIVATE_KEY: "$SSH_PRIVATE_KEY"
+  SSH_USER: "$SSH_USER"
+  EC2_IPADDRESS: "$EC2_IPADDRESS"
+
+before_script:
+  - 'which ssh-agent || (apt-get update -y && apt-get install openssh-client -y)'
+  - eval $(ssh-agent -s)
+  - echo "$SSH_PRIVATE_KEY" | tr -d '\r' > /tmp/private_key
+  - chmod 600 /tmp/private_key
+  - echo "Attempting to add SSH key to agent..."
+  - ssh-add -L || true  # List currently loaded keys (for debugging)
+  - cat /tmp/private_key | ssh-add -vv || true  # Attempt to add the key, with verbose output
+
+setup:
+  stage: setup
+  script:
+    - echo "Setting up EC2 instance..."
+    - echo "EC2_IPADDRESS:$EC2_IPADDRESS"
+    - echo "SSH_USER:$SSH_USER"
+    - echo "Docker installed successfully!"
+  only:
+    - main
+
+deploy:
+  stage: deploy
+  script:
+    - echo "Deploying Dockerized App..."
+  only:
+    - main
+
+
+
+
+
+
+
